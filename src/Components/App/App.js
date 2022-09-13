@@ -1,42 +1,72 @@
-import React, { useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import './App.scss';
 import Weather from '../Weather/Weather';
 import HourlyWeather from '../Hourly-Weather/HourlyWeather';
+import { Search } from '../Search/Search';
+
 
 const App = () =>
 {
-  const apiKey = "69c36513b8f1b04a9ae7df1c6310f2e1"
-  const [weatherData, setWeatherData] = useState([{}])
+  const apiKey = "f66a722a35284f1b99431f6f59051780"
+  const [dailyData, setDailyData] = useState()
+  const [currentData, setCurrentData] = useState()
   const [city, setCity] = useState("")
 
-  const getWeather = (event) =>
+  // const importAllIcons = require =>
+  // require.keys().reduce((acc, next) => {
+  //   acc[next.replace("./", "")] = require(next);
+  //   return acc;
+  // }, {});
+
+  // const icons = importAllIcons(
+  //   require.context("../../Images/Icons", false, /\.(png|jpe?g|svg)$/)
+  // );
+  
+  const getWeather  = async (event) =>
   {
-    if (event.key == 'Enter')
+    if (event.key === 'Enter')
     {
-      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},au&appid=${apiKey}&units=metric`)
-        .then(response => response.json())
-          .then(
-            data =>
-            {
-              setWeatherData(data)
-            }
-        )
+      await fetch(` https://api.weatherbit.io/v2.0/current?city=${city}&country=AU&key=${apiKey}`)
+      .then(response => response.json())
+        .then(
+          data => setCurrentData(data.data[0])
+      )
+      await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&country=AU&key=${apiKey}&days=7`)
+      .then(response => response.json())
+        .then(
+          data => setDailyData(data)
+      )
+
+      setCity("")
     }
   }
 
+ 
   return (
     <div className='app'>
-      <div className='container'>
-        <input
-          className='input'
-          type="text"
-          placeholder='Enter your city...'
-          onChange={e => setCity(e.target.value)}
-          value={city}
-          onKeyDown={getWeather} />
-        <Weather />
-      </div>
-        <HourlyWeather/>
+     
+      {typeof dailyData === 'undefined' ? (
+        <div className='undefined'>
+          <h1>Lets find the Weather!</h1>
+          <Search city={city} setCity={setCity} getWeather={getWeather} />
+        </div>
+      ) :
+      (
+          <Fragment>
+            <Search city={city} setCity={setCity} getWeather={getWeather} />
+            <Weather
+              location={currentData.city_name}
+              temp={currentData.temp}
+              description={currentData.weather.description}
+             icon={ currentData.weather.icon}
+            />
+            <HourlyWeather
+              data = {dailyData.data}
+            />
+            {  console.log(currentData)}
+        </Fragment>
+      )}
+  
     </div>
   )
 }
