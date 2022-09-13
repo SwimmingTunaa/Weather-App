@@ -1,0 +1,23 @@
+.main{
+    padding-top: 45px;
+    padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    color: whitesmoke;
+    
+    h2{
+        margin: auto;
+        font-size: 1.5rem;
+    }
+    h1{
+        margin: auto
+    }
+}
+
+.weather{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 30%;
+    margin: auto;
+}
